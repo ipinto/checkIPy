@@ -1,19 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import argparse
-import smtplib
-import urllib2
 import settings
+from settings import logging
+import smtplib
+import telegram
+import urllib2
+
 
 def get_arguments():
-    parser = argparse.ArgumentParser(description='Check your external IP.')
-    parser.add_argument('-e', '--email', dest='action', action='store_const',
-                   const=send_email, default=print_ip,
-                   help='send an email with your IP (default: print it on terminal)')
+    parser = argparse.ArgumentParser(description = 'Check your external IP.')
+    parser.add_argument('-c', '--console', action='store_true',
+                   help = 'print your IP on console (default action)')
+    parser.add_argument('-e', '--email', action='store_true',
+                   help = 'send an email with your IP')
+    parser.add_argument('-t', '--telegram', action='store_true',
+                   help = 'send a Telegram message with your IP')
     return parser.parse_args()
 
 def print_ip(ip):
-    print "External IP: {}".format(ip)
+    print ip
 
 def send_email(ip):
     message = """\
@@ -34,6 +40,31 @@ Subject: {subject}
     server.sendmail(settings.FROM, settings.TO, message)
     server.quit()
 
+def send_telegram_message(ip):
+    bot = telegram.Bot(token = settings.TELEGRAM_TOKEN)
+    try:
+        logging.debug(bot.getMe())
+    except telegram.error.Unauthorized:
+        logging.error("Unauthorized. Check your Telegram credentials.")
+        return
+
+    bot_updates = bot.getUpdates()
+    if not bot_updates or not bot_updates[-1].message.chat_id:
+        logging.error("We need your telegram chat id. Please, send any message to your bot.")
+        return
+
+    try:
+        sent_message = bot.sendMessage(chat_id = bot_updates[-1].message.chat_id,
+            text = "Your IP is: {}".format(ip))
+    except telegram.TelegramError:
+        logging.error("An error raised sending the Telegram message. " +
+            "Please, send a new message to your bot and try again. " +
+            "This way we check if the chat_id is not updated.")
+
+
 if __name__ == "__main__":
+    ip = urllib2.urlopen(settings.IP_SOURCE).read()
     args = get_arguments()
-    args.action(urllib2.urlopen(settings.IP_SOURCE).read())
+    if args.email: send_email(ip)
+    if args.telegram: send_telegram_message(ip)
+    if args.console or (not args.email and not args.telegram): print_ip(ip)
