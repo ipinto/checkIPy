@@ -1,15 +1,20 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import argparse
+import dbManager
 import settings
 from settings import logging
 import smtplib
 import telegram
 import urllib2
+import sys
 
 
 def get_arguments():
     parser = argparse.ArgumentParser(description = 'Check your external IP.')
+    parser.add_argument('-d', '--diff', action='store_true',
+                   help = 'check if the IP changed since last time. ' +
+                          "If it didn't, it will do nothing.")
     parser.add_argument('-c', '--console', action='store_true',
                    help = 'print your IP on console (default action)')
     parser.add_argument('-e', '--email', action='store_true',
@@ -21,7 +26,7 @@ def get_arguments():
 def print_ip(ip):
     print ip
 
-def send_email(ip):
+def send_email(message):
     message = """\
 From: {from_address}
 To: {to_address}
@@ -31,7 +36,7 @@ Subject: {subject}
     """.format(from_address = settings.FROM,
                 to_address = settings.TO,
                 subject = 'Your IP status',
-                message = 'Your IP is: {}'.format(ip))
+                message = message)
 
     # Send email
     server = smtplib.SMTP(settings.SMTP)
@@ -40,7 +45,7 @@ Subject: {subject}
     server.sendmail(settings.FROM, settings.TO, message)
     server.quit()
 
-def send_telegram_message(ip):
+def send_telegram_message(message):
     bot = telegram.Bot(token = settings.TELEGRAM_TOKEN)
     try:
         logging.debug(bot.getMe())
@@ -55,7 +60,7 @@ def send_telegram_message(ip):
 
     try:
         sent_message = bot.sendMessage(chat_id = bot_updates[-1].message.chat_id,
-            text = "Your IP is: {}".format(ip))
+            text = message)
     except telegram.TelegramError:
         logging.error("An error raised sending the Telegram message. " +
             "Please, send a new message to your bot and try again. " +
@@ -63,8 +68,16 @@ def send_telegram_message(ip):
 
 
 if __name__ == "__main__":
-    ip = urllib2.urlopen(settings.IP_SOURCE).read()
+    current_ip = urllib2.urlopen(settings.IP_SOURCE).read()
+    message = 'Your IP is: {}'.format(current_ip)
+
     args = get_arguments()
-    if args.email: send_email(ip)
-    if args.telegram: send_telegram_message(ip)
-    if args.console or (not args.email and not args.telegram): print_ip(ip)
+    if args.diff:
+        last_ip = dbManager.get_last_ip()
+        if last_ip == current_ip: sys.exit()
+        message = 'Your IP has changed: {} -> {}'.format(last_ip, current_ip)
+
+    dbManager.update_ip(current_ip)
+    if args.email: send_email(message)
+    if args.telegram: send_telegram_message(message)
+    if args.console or (not args.email and not args.telegram): print_ip(current_ip)
