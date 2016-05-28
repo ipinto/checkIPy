@@ -17,5 +17,3 @@ IP_SOURCE='https://api.ipify.org'
 
 # Telegram Bot
 TELEGRAM_TOKEN='your_bot_token'
-# chatId = bot.getUpdates()[-1].message.chat_id
-TELEGRAM_CHAT_ID='your_chat_id'

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import settings
+from settings import logging
 import smtplib
 import telegram
 import urllib2
@@ -41,8 +42,25 @@ Subject: {subject}
 
 def send_telegram_message(ip):
     bot = telegram.Bot(token = settings.TELEGRAM_TOKEN)
-    bot.sendMessage(chat_id = settings.TELEGRAM_CHAT_ID,
-        text = "Your IP is: {}".format(ip))
+    try:
+        logging.debug(bot.getMe())
+    except telegram.error.Unauthorized:
+        logging.error("Unauthorized. Check your Telegram credentials.")
+        return
+
+    bot_updates = bot.getUpdates()
+    if not bot_updates or not bot_updates[-1].message.chat_id:
+        logging.error("We need your telegram chat id. Please, send any message to your bot.")
+        return
+
+    try:
+        sent_message = bot.sendMessage(chat_id = bot_updates[-1].message.chat_id,
+            text = "Your IP is: {}".format(ip))
+    except telegram.TelegramError:
+        logging.error("An error raised sending the Telegram message. " +
+            "Please, send a new message to your bot and try again. " +
+            "This way we check if the chat_id is not updated.")
+
 
 if __name__ == "__main__":
     ip = urllib2.urlopen(settings.IP_SOURCE).read()

@@ -8,6 +8,7 @@ Inspired in [checkIP](https://github.com/gexplorer/checkIP) project.
 
 ## Installation
 If you want to work with virtual environments:
+
 1. Read *Managing Environments* [documentation](http://virtualenvwrapper.readthedocs.org/en/latest/command_ref.html).
 2. Create a virtual environment for this project: `$ mkvirtualenv checkIPy`.
 3. Then, when you want to work on this project: `$ workon checkIPy`.
@@ -41,14 +42,14 @@ IP_SOURCE='https://api.ipify.org'
 ### Telegram bot
 Check how to [create a Telegram bot](https://core.telegram.org/bots).
 
-You should create your own bot and include in the configuration file your bot **bot token**.
-
-The app needs to know the chat id... Need to figure out which is the best way to get the chat_id and store it.
+You should create your own bot and include in the configuration file your **bot token**:
 
 ```python
 # Telegram Bot
 TELEGRAM_TOKEN='your_bot_token'
 ```
+
+The app needs to know the chat id, so you must send a message to your bot in order to start working.
 
 ## Run script
 ```
