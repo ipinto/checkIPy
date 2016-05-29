@@ -8,6 +8,8 @@ You can send a notification only if the IP changed.
 
 Inspired in [checkIP](https://github.com/gexplorer/checkIP) project.
 
+*Only tested using Python 2.7.10*
+
 ## Installation
 If you want to work with virtual environments:
 
