@@ -13,7 +13,7 @@ PASSWORD='password'
 TO='to_email@gmail.com'
 
 # IP endpoint
-IP_SOURCE='https://api.ipify.org'
+IP_SOURCE='http://api.ipify.org'
 
 # Telegram Bot
 TELEGRAM_TOKEN='your_bot_token'
