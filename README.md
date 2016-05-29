@@ -1,8 +1,10 @@
 # checkIPy
-Script in Python to notify your IP status via:
+Script in Python to notify your current IP via:
 * Terminal.
 * Email.
 * [Telegram](https://telegram.org/).
+
+You can send a notification only if the IP changed.
 
 Inspired in [checkIP](https://github.com/gexplorer/checkIP) project.
 
@@ -51,16 +53,33 @@ TELEGRAM_TOKEN='your_bot_token'
 
 The app needs to know the chat id, so you must send a message to your bot in order to start working.
 
+### Database configuration
+By default, your last IP is stored in the file *data.db*, but you can change the file name or location.
+```python
+# Database
+DB_FILE_NAME='data.db'
+```
+
 ## Run script
 ```
 $ python checkIPy.py --help
-usage: checkIPy.py [-h] [-c] [-e] [-t]
+usage: checkIPy.py [-h] [-d] [-c] [-e] [-t]
 
 Check your external IP.
 
 optional arguments:
   -h, --help      show this help message and exit
+  -d, --diff      check if the IP changed since last time. If it didn't, it will do nothing.
   -c, --console   print your IP on console (default action)
   -e, --email     send an email with your IP
   -t, --telegram  send a Telegram message with your IP
 ```
+
+### Examples
+* Show my current IP: `$ python checkIPy.py` -> `1.2.3.4`
+
+* Show my current IP and send me an email: `$ python checkIPy.py -ce` -> `1.2.3.4`
+
+* Show my current IP only if it changed since last time: `$ python checkIPy.py --diff` -> `4.3.2.1`
+
+* Show and send my current IP via email and Telegram only if it changed since last time: `$ python checkIPy.py -dcet`
