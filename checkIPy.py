@@ -5,9 +5,9 @@ import dbManager
 import settings
 from settings import logging
 import smtplib
+import sys
 import telegram
 import urllib2
-import sys
 
 
 def get_arguments():
@@ -22,9 +22,6 @@ def get_arguments():
     parser.add_argument('-t', '--telegram', action='store_true',
                    help = 'send a Telegram message with your IP')
     return parser.parse_args()
-
-def print_ip(ip):
-    print ip
 
 def send_email(message):
     message = """\
@@ -46,7 +43,12 @@ Subject: {subject}
     server.quit()
 
 def send_telegram_message(message):
-    bot = telegram.Bot(token = settings.TELEGRAM_TOKEN)
+    try:
+        bot = telegram.Bot(token = settings.TELEGRAM_TOKEN)
+    except telegram.error.InvalidToken:
+        logging.error("Invalid Token. Check your Telegram token configuration.")
+        return
+
     try:
         logging.debug(bot.getMe())
     except telegram.error.Unauthorized:
@@ -80,4 +82,4 @@ if __name__ == "__main__":
     dbManager.update_ip(current_ip)
     if args.email: send_email(message)
     if args.telegram: send_telegram_message(message)
-    if args.console or (not args.email and not args.telegram): print_ip(current_ip)
+    if args.console or (not args.email and not args.telegram): print(current_ip)
