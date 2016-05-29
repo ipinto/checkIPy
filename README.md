@@ -1,10 +1,5 @@
 # checkIPy
-Script in Python to notify your current IP via:
-* Terminal.
-* Email.
-* [Telegram](https://telegram.org/).
-
-You can send a notification only if the IP changed.
+Python script that sends you an email or a [Telegram](https://telegram.org/) message if your IP address changes.
 
 Inspired in [checkIP](https://github.com/gexplorer/checkIP) project.
 
