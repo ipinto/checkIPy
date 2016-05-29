@@ -17,3 +17,6 @@ IP_SOURCE='https://api.ipify.org'
 
 # Telegram Bot
 TELEGRAM_TOKEN='your_bot_token'
+
+# Database
+DB_FILE_NAME='data.db'
