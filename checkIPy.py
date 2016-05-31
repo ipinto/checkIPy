@@ -10,6 +10,10 @@ import telegram
 import urllib2
 
 
+def get_device_name():
+    if settings.DEVICE_NAME: return '[{}] '.format(settings.DEVICE_NAME)
+    return ''
+
 def get_arguments():
     parser = argparse.ArgumentParser(description = 'Check your external IP.')
     parser.add_argument('-d', '--diff', action='store_true',
@@ -32,7 +36,7 @@ Subject: {subject}
 {message}
     """.format(from_address = settings.FROM,
                 to_address = settings.TO,
-                subject = 'Your IP status',
+                subject = '{}My IP status'.format(get_device_name()),
                 message = message)
 
     # Send email
@@ -62,7 +66,7 @@ def send_telegram_message(message):
 
     try:
         sent_message = bot.sendMessage(chat_id = bot_updates[-1].message.chat_id,
-            text = message)
+            text = get_device_name() + message)
     except telegram.TelegramError:
         logging.error("An error raised sending the Telegram message. " +
             "Please, send a new message to your bot and try again. " +
@@ -71,13 +75,13 @@ def send_telegram_message(message):
 
 if __name__ == "__main__":
     current_ip = urllib2.urlopen(settings.IP_SOURCE).read()
-    message = 'Your IP is: {}'.format(current_ip)
+    message = 'My IP is: {}'.format(current_ip)
 
     args = get_arguments()
     if args.diff:
         last_ip = dbManager.get_last_ip()
         if last_ip == current_ip: sys.exit()
-        message = 'Your IP has changed: {} -> {}'.format(last_ip, current_ip)
+        message = 'My IP has changed: {} -> {}'.format(last_ip, current_ip)
 
     dbManager.update_ip(current_ip)
     if args.email: send_email(message)
