@@ -23,10 +23,19 @@ You will need to install all the requirements: `$ pip install -r requirements.tx
 ## Configuration
 You must edit `settings.py` file with your configuration data in order to send emails or telegram messages.
 
+### Multiple devices
+If you use this script in several devices, you can configure a name for each of them. This way, the name of the device will appear in the email subject or in the Telegram message.
+
+If you leave it with an empty string, no name will be included.
+```python
+# Multiple devices config
+DEVICE_NAME='Raspberry pi'
+```
+
 ### Mail
 *Gmail configuration example:*
 ```python
-# SMTP Config
+# SMTP config
 SMTP='smtp.gmail.com:587'
 FROM='from_email@gmail.com'
 USERNAME='from_email@gmail.com'

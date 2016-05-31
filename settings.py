@@ -3,6 +3,9 @@ import logging
 logging.basicConfig(level=logging.ERROR,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
+# Multiple devices config
+DEVICE_NAME=''
+
 # SMTP Config
 SMTP='smtp.gmail.com:587'
 FROM='from_email@gmail.com'
